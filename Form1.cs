@@ -10,22 +10,7 @@ public partial class Form1 : Form
         InitializeComponent();
     }
 
-    private void label1_Click(object sender, EventArgs e)
-    {
-
-    }
-
     private void Form1_Load(object sender, EventArgs e)
-    {
-
-    }
-
-    private void richTextBox1_TextChanged(object sender, EventArgs e)
-    {
-
-    }
-
-    private void dgvActions_CellContentClick(object sender, DataGridViewCellEventArgs e)
     {
 
     }
@@ -39,11 +24,22 @@ public partial class Form1 : Form
             return;
         }
 
-        btnRun.Text = "Stop";
-        running = true;
+        IndicateActionsRunState();
         rtbTerminal.Text += "Starting...\n";
         Thread.Sleep(1000);
         RunActions();
+        IndicateActionsStopState();
+    }
+
+    private void IndicateActionsRunState()
+    {
+        btnRun.Text = "Stop";
+        running = true;
+    }
+
+    private void IndicateActionsStopState()
+    {
+        btnRun.Text = "Run";
         running = false;
     }
 
@@ -52,22 +48,35 @@ public partial class Form1 : Form
     {
         foreach (DataGridViewRow row in dgvActions.Rows)
         {
-            if (row.Cells[0].Value == null)
+            object value = row.Cells[0].Value;
+            if (value == null)
                 continue;
+            string action = value.ToString();
 
-            int count = 1;
-            if (row.Cells[1].Value == null)
-            {
-                _ = int.TryParse(Text, out count);
-            }
+            int count = ParseCount(row);
 
             for (int i = 0; i < count; i++)
             {
                 if (!running)
                     return;
-                SendKeys.Send("test");
-                Thread.Sleep(10);
+                if (action == "Wait 1 second")
+                {
+                    Thread.Sleep(1000);
+                }
+                else
+                {
+                    SendKeys.Send("test");
+                    Thread.Sleep(10);
+                }
             }
         }
+    }
+
+    private int ParseCount(DataGridViewRow row)
+    {
+        int count = 1;
+        if (row.Cells[1].Value == null)
+            _ = int.TryParse(Text, out count);
+        return count;
     }
 }

@@ -90,7 +90,6 @@ partial class Form1
         dgvActions.RowTemplate.DefaultCellStyle.ForeColor = Color.White;
         dgvActions.Size = new Size(388, 341);
         dgvActions.TabIndex = 0;
-        dgvActions.CellContentClick += dgvActions_CellContentClick;
         // 
         // lblRepeat
         // 
@@ -101,7 +100,6 @@ partial class Form1
         lblRepeat.Size = new Size(43, 15);
         lblRepeat.TabIndex = 1;
         lblRepeat.Text = "Repeat";
-        lblRepeat.Click += label1_Click;
         // 
         // txtRepeat
         // 
@@ -137,7 +135,6 @@ partial class Form1
         rtbTerminal.Size = new Size(373, 410);
         rtbTerminal.TabIndex = 4;
         rtbTerminal.Text = "";
-        rtbTerminal.TextChanged += richTextBox1_TextChanged;
         // 
         // btnRun
         // 
@@ -147,7 +144,7 @@ partial class Form1
         btnRun.TabIndex = 5;
         btnRun.Text = "Run";
         btnRun.UseVisualStyleBackColor = true;
-        btnRun.Click += btnRun_Click;
+        btnRun.Click += Run_Click;
         // 
         // Action
         // 

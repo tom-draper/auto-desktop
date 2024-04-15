@@ -1,2 +1,3 @@
 # auto-desktop
-A desktop application for repetitive input.
+
+An easy-to-use, cross-platform application for automatic keyboard and mouse entry.

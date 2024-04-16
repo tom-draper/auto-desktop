@@ -8,21 +8,38 @@ namespace auto_desktop
 {
     internal class Actions
     {
-        public Actions()
+        private static readonly List<Action> _Actions = InitialiseActions();
+
+        public class Action(string name, string? code)
         {
-            List<Action> Actions = GetActions();
+            public readonly string Name = name;
+            public readonly string? Code = code;
         }
 
-        class Action(string ID, string Name, string Code)
+        private static List<Action> InitialiseActions()
         {
-            string ID = ID;
-            string Name = Name;
-            string Code = Code;
+            return [
+                new Action("Enter", "{ENTER}"),
+                new Action("Up", "{UP}"),
+                new Action("Down", "{DOWN}"),
+                new Action("Left", "{LEFT}"),
+                new Action("Right", "{RIGHT}"),
+                new Action("Tab", "{TAB}"),
+                new Action("Wait 1 millisecond", null),
+                new Action("Wait 1 second", null),
+                new Action("Wait 1 minute", null),
+                new Action("Wait 1 hour", null),
+            ];
         }
 
-        private List<Action> GetActions()
+        public static List<Action> GetActions()
         {
-            return new List<Action> { Action("hi", "hello", "h") }
+            return _Actions;
+        }
+
+        public static Action GetAction(string name)
+        {
+            return _Actions.FirstOrDefault(action => action.Name == name);
         }
     }
 }

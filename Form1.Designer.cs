@@ -1,6 +1,6 @@
 ﻿namespace auto_desktop;
 
-partial class Form1
+partial class Form
 {
     /// <summary>
     ///  Required designer variable.
@@ -35,18 +35,19 @@ partial class Form1
         DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
         DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
         DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form));
         dgvActions = new DataGridView();
         Action = new DataGridViewComboBoxColumn();
         Count = new DataGridViewTextBoxColumn();
-        lblRepeat = new Label();
         txtRepeat = new TextBox();
-        lblTimes = new Label();
         rtbTerminal = new RichTextBox();
         btnRun = new Button();
         lblSeconds = new Label();
         txtDelay = new TextBox();
         label2 = new Label();
+        pictureBox1 = new PictureBox();
         ((System.ComponentModel.ISupportInitialize)dgvActions).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
         SuspendLayout();
         // 
         // dgvActions
@@ -56,7 +57,7 @@ partial class Form1
         dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
         dataGridViewCellStyle1.SelectionForeColor = Color.White;
         dgvActions.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-        dgvActions.BackgroundColor = Color.FromArgb(28, 35, 50);
+        dgvActions.BackgroundColor = Color.FromArgb(29, 35, 50);
         dgvActions.BorderStyle = BorderStyle.None;
         dgvActions.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
         dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
@@ -120,38 +121,17 @@ partial class Form1
         Count.SortMode = DataGridViewColumnSortMode.NotSortable;
         Count.Width = 80;
         // 
-        // lblRepeat
-        // 
-        lblRepeat.AutoSize = true;
-        lblRepeat.ForeColor = Color.White;
-        lblRepeat.Location = new Point(14, 24);
-        lblRepeat.Name = "lblRepeat";
-        lblRepeat.Size = new Size(43, 15);
-        lblRepeat.TabIndex = 1;
-        lblRepeat.Text = "Repeat";
-        // 
         // txtRepeat
         // 
         txtRepeat.BackColor = Color.FromArgb(15, 21, 36);
         txtRepeat.BorderStyle = BorderStyle.None;
         txtRepeat.ForeColor = Color.White;
-        txtRepeat.Location = new Point(59, 24);
+        txtRepeat.Location = new Point(45, 25);
         txtRepeat.Name = "txtRepeat";
         txtRepeat.Size = new Size(37, 16);
         txtRepeat.TabIndex = 2;
         txtRepeat.Text = "1";
         txtRepeat.TextAlign = HorizontalAlignment.Center;
-        txtRepeat.TextChanged += txtRepeat_TextChanged;
-        // 
-        // lblTimes
-        // 
-        lblTimes.AutoSize = true;
-        lblTimes.ForeColor = Color.White;
-        lblTimes.Location = new Point(99, 24);
-        lblTimes.Name = "lblTimes";
-        lblTimes.Size = new Size(31, 15);
-        lblTimes.TabIndex = 3;
-        lblTimes.Text = "time";
         // 
         // rtbTerminal
         // 
@@ -160,15 +140,17 @@ partial class Form1
         rtbTerminal.BorderStyle = BorderStyle.None;
         rtbTerminal.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
         rtbTerminal.ForeColor = Color.White;
-        rtbTerminal.Location = new Point(414, -13);
-        rtbTerminal.Margin = new Padding(1);
+        rtbTerminal.Location = new Point(414, -20);
+        rtbTerminal.Margin = new Padding(1, 1, 10, 1);
         rtbTerminal.Name = "rtbTerminal";
-        rtbTerminal.Size = new Size(385, 450);
+        rtbTerminal.ReadOnly = true;
+        rtbTerminal.Size = new Size(385, 457);
         rtbTerminal.TabIndex = 4;
         rtbTerminal.Text = "\n";
         // 
         // btnRun
         // 
+        btnRun.FlatStyle = FlatStyle.System;
         btnRun.Location = new Point(325, 397);
         btnRun.Name = "btnRun";
         btnRun.Size = new Size(75, 23);
@@ -210,25 +192,35 @@ partial class Form1
         label2.TabIndex = 6;
         label2.Text = "Start in";
         // 
-        // Form1
+        // pictureBox1
+        // 
+        pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+        pictureBox1.Location = new Point(14, 20);
+        pictureBox1.Name = "pictureBox1";
+        pictureBox1.Size = new Size(29, 23);
+        pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+        pictureBox1.TabIndex = 9;
+        pictureBox1.TabStop = false;
+        // 
+        // Form
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        BackColor = Color.FromArgb(28, 35, 50);
+        BackColor = Color.FromArgb(29, 35, 50);
         ClientSize = new Size(797, 432);
+        Controls.Add(pictureBox1);
         Controls.Add(lblSeconds);
         Controls.Add(txtDelay);
         Controls.Add(label2);
         Controls.Add(btnRun);
         Controls.Add(rtbTerminal);
-        Controls.Add(lblTimes);
         Controls.Add(txtRepeat);
-        Controls.Add(lblRepeat);
         Controls.Add(dgvActions);
-        Name = "Form1";
-        Text = "Form1";
-        Load += Form1_Load;
+        Name = "Form";
+        Text = "Auto Desktop";
+        Load += Form_Load;
         ((System.ComponentModel.ISupportInitialize)dgvActions).EndInit();
+        ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
         ResumeLayout(false);
         PerformLayout();
     }
@@ -236,9 +228,7 @@ partial class Form1
     #endregion
 
     private DataGridView dgvActions;
-    private Label lblRepeat;
     private TextBox txtRepeat;
-    private Label lblTimes;
     private RichTextBox rtbTerminal;
     private Button btnRun;
     private Label lblSeconds;
@@ -246,4 +236,5 @@ partial class Form1
     private Label label2;
     private DataGridViewComboBoxColumn Action;
     private DataGridViewTextBoxColumn Count;
+    private PictureBox pictureBox1;
 }

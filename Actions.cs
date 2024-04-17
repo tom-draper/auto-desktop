@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace auto_desktop
+﻿namespace auto_desktop
 {
     internal class Actions
     {
@@ -26,6 +19,8 @@ namespace auto_desktop
             actions.AddRange(GetNumberActions());
             actions.AddRange(GetUtilityActions());
             actions.AddRange(GetFunctionActions());
+            actions.AddRange(GetSymbolActions());
+            actions.AddRange(GetMouseActions());
 
             return actions;
         }
@@ -101,6 +96,69 @@ namespace auto_desktop
                 new Action("Page Down", "{PGDN}"),
                 new Action("Escape", "{ESC}"),
             ];
+        }
+
+        private static List<Action> GetSymbolActions()
+        {
+            return [
+                new Action("!", "!"),
+                new Action("@", "@"),
+                new Action("#", "#"),
+                new Action("$", "$"),
+                new Action("%", "%"),
+                new Action("^", "^"),
+                new Action("&", "&"),
+                new Action("*", "*"),
+                new Action("(", "("),
+                new Action(")", ")"),
+                new Action("-", "-"),
+                new Action("_", "_"),
+                new Action("=", "="),
+                new Action("+", "+"),
+                new Action("[", "["),
+                new Action("{", "{"),
+                new Action("]", "]"),
+                new Action("}", "}"),
+                new Action(";", ";"),
+                new Action(":", ":"),
+                new Action("'", "'"),
+                new Action("\"", "\""),
+                new Action(",", ","),
+                new Action("<", "<"),
+                new Action(".", "."),
+                new Action(">", ">"),
+                new Action("/", "/"),
+                new Action("?", "?"),
+                new Action("\\", "\\"),
+                new Action("|", "|"),
+                new Action("`", "`"),
+                new Action("~", "~"),
+            ];
+        }
+
+        private static List<Action> GetMouseActions()
+        {
+            return [
+                new Action("Left click", null),
+                new Action("Right click", null),
+                new Action("Middle click", null),
+                new Action("Scroll up", null),
+                new Action("Scroll down", null),
+                new Action("Mouse 1px left", null),
+                new Action("Mouse 1px right", null),
+                new Action("Mouse 1px up", null),
+                new Action("Mouse 1px down", null),
+            ];
+        }
+
+        public static bool IsMouseAction(string actionName)
+        {
+            return GetMouseActions().Any(action => action.Name == actionName);
+        }
+
+        public static bool IsDelayAction(string actionName)
+        {
+            return GetDelayActions().Any(action => action.Name == actionName);
         }
 
         public static List<Action> GetActions()

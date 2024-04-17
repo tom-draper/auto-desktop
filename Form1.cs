@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace auto_desktop;
 
 public partial class Form : System.Windows.Forms.Form
@@ -69,7 +71,8 @@ public partial class Form : System.Windows.Forms.Form
     private void LogToUserConsole(string text, bool prefixNewline = false)
     {
         string prefix = prefixNewline ? "\n" : "";
-        this.Invoke(new Action(() => {
+        this.Invoke(new Action(() =>
+        {
             rtbTerminal.AppendText($"{prefix}[{DateTime.Now.ToString("HH:mm:ss")}] {text}\n");
             // Scroll to end of text
             rtbTerminal.SelectionStart = rtbTerminal.Text.Length;
@@ -79,7 +82,8 @@ public partial class Form : System.Windows.Forms.Form
 
     private void IndicateActionsRunState()
     {
-        this.Invoke(new Action(() => {
+        this.Invoke(new Action(() =>
+        {
             btnRun.Text = "Stop";
             runningActions = true;
         }));
@@ -87,7 +91,8 @@ public partial class Form : System.Windows.Forms.Form
 
     private void IndicateActionsStopState()
     {
-        this.Invoke(new Action(() => {
+        this.Invoke(new Action(() =>
+        {
             btnRun.Text = "Run";
             runningActions = false;
         }));
@@ -122,7 +127,7 @@ public partial class Form : System.Windows.Forms.Form
         int count = ParseRepeat();
         for (int i = 0; i < count; i++)
         {
-            bool completed = RunActionsOnce(i+1, count);
+            bool completed = RunActionsOnce(i + 1, count);
             if (!completed)
                 return false;
         }
@@ -155,39 +160,102 @@ public partial class Form : System.Windows.Forms.Form
 
                 if (iteration == 1 && totalIterations == 1)
                 {
-                    LogToUserConsole($"Running action [{i-skippedRows+1}/{rowCount}]: {actionName}");
+                    LogToUserConsole($"Running action [{i - skippedRows + 1}/{rowCount}]: {actionName}");
                 }
                 else
                 {
-                    LogToUserConsole($"Running action [{iteration}/{totalIterations}, {i-skippedRows+1}/{rowCount}]: {actionName}");
+                    LogToUserConsole($"Running action [{iteration}/{totalIterations}, {i - skippedRows + 1}/{rowCount}]: {actionName}");
                 }
 
-                switch (actionName)
-                {
-                    case "Wait 1 millisecond":
-                        Thread.Sleep(1);
-                        break;
-                    case "Wait 1 second":
-                        Thread.Sleep(1000);
-                        break;
-                    case "Wait 1 minute":
-                        Thread.Sleep(1000 * 60);
-                        break;
-                    case "Wait 1 hour":
-                        Thread.Sleep(1000 * 60 * 60);
-                        break;
-                    default:
-                        Actions.Action action = Actions.GetAction(actionName);
-                        if (action.Code == null)
-                            continue;
-
-                        SendKeys.SendWait(action.Code);
-                        break;
-                }
+                PerformAction(actionName);
             }
             row.Selected = false;
         }
         return true;
+    }
+
+    private void PerformAction(string actionName)
+    {
+        if (Actions.IsDelayAction(actionName))
+        {
+            PerformDelayAction(actionName);
+        }
+        else if (Actions.IsMouseAction(actionName))
+        {
+            PerformMouseAction(actionName);
+        }
+        else
+        {
+            PerformKeyboardAction(actionName);
+        }
+    }
+
+    private void PerformDelayAction(string actionName)
+    {
+        switch (actionName)
+        {
+            case "Wait 1 millisecond":
+                Thread.Sleep(1);
+                break;
+            case "Wait 1 second":
+                Thread.Sleep(1000);
+                break;
+            case "Wait 1 minute":
+                Thread.Sleep(1000 * 60);
+                break;
+            case "Wait 1 hour":
+                Thread.Sleep(1000 * 60 * 60);
+                break;
+        }
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+    public static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
+
+    private const int MOUSEEVENTF_LEFTDOWN = 0x02;
+    private const int MOUSEEVENTF_LEFTUP = 0x04;
+    private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+    private const int MOUSEEVENTF_RIGHTUP = 0x10;
+    private const int MOUSEEVENTF_MIDDLEDOWN = 0x20;
+    private const int MOUSEEVENTF_MIDDLEUP = 0x40;
+
+    private static void PerformMouseAction(string actionName)
+    {
+
+        switch (actionName)
+        {
+            case "Mouse 1px left":
+                Cursor.Position = new Point(Cursor.Position.X - 1, Cursor.Position.Y);
+                break;
+            case "Mouse 1px right":
+                Cursor.Position = new Point(Cursor.Position.X + 1, Cursor.Position.Y);
+                break;
+            case "Mouse 1px up":
+                Cursor.Position = new Point(Cursor.Position.X, Cursor.Position.Y - 1);
+                break;
+            case "Mouse 1px down":
+                Cursor.Position = new Point(Cursor.Position.X, Cursor.Position.Y + 1);
+                break;
+            case "Left click":
+                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                break;
+            case "Right click":
+                mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
+                mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+                break;
+            case "Middle click":
+                mouse_event(MOUSEEVENTF_MIDDLEDOWN, 0, 0, 0, 0);
+                mouse_event(MOUSEEVENTF_MIDDLEUP, 0, 0, 0, 0);
+                break;
+        }
+    }
+
+    private static void PerformKeyboardAction(string actionName)
+    {
+        Actions.Action action = Actions.GetAction(actionName);
+        if (action.Code != null)
+            SendKeys.SendWait(action.Code);
     }
 
     private static string ParseActionName(DataGridViewRow row)

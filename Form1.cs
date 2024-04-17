@@ -286,4 +286,34 @@ public partial class Form : System.Windows.Forms.Form
             lblSeconds.Text = $"seconds";
         }
     }
+
+    private void dgvActions_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+    {
+
+        e.CellStyle.BackColor = dgvActions.DefaultCellStyle.BackColor;
+
+        // Check if currently on the Product column
+
+        DataGridView dgv = sender as DataGridView;
+        if (dgv == null || dgv.CurrentCell == null || !(e.Control is ComboBox))
+        {
+            return;
+        }
+
+        ComboBox cbo = (ComboBox)e.Control;
+        cbo.DropDownStyle = ComboBoxStyle.DropDown;
+
+        // 29.0.0.0 - We need this handler attached to this dropdown column only in order to force it to take the value entered in text if it fails to do so itself
+        cbo.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
+    }
+
+    private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        // 29.0.0.0 - There was an issue when typing in the value and clicking tab sometimes wouldn't register a ValueChange
+        // So here we intercept any current text just entered into the dropdown and force it to change value
+        if (dgvActions.CurrentCell != null)
+        {
+            dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
+        }
+    }
 }

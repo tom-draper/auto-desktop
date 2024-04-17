@@ -98,6 +98,7 @@ partial class Form
         dgvActions.RowTemplate.DefaultCellStyle.ForeColor = Color.White;
         dgvActions.Size = new Size(388, 341);
         dgvActions.TabIndex = 0;
+        dgvActions.EditingControlShowing += dgvActions_EditingControlShowing;
         // 
         // Action
         // 

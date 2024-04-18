@@ -1,11 +1,12 @@
 using System.Runtime.InteropServices;
+using auto_desktop.Classes;
 
 namespace auto_desktop;
 
 public partial class Form : System.Windows.Forms.Form
 {
 
-    bool runningActions = false;
+    private bool runningActions = false;
 
     public Form()
     {
@@ -29,6 +30,7 @@ public partial class Form : System.Windows.Forms.Form
 
     private void Run_Click(object sender, EventArgs e)
     {
+        // Remove any existing cell highlights before row highlight animation
         DeselectAllRows();
 
         // Handle stopping actions
@@ -71,9 +73,9 @@ public partial class Form : System.Windows.Forms.Form
     private void LogToUserConsole(string text, bool prefixNewline = false)
     {
         string prefix = prefixNewline ? "\n" : "";
-        this.Invoke(new Action(() =>
+        Invoke(new Action(() =>
         {
-            rtbTerminal.AppendText($"{prefix}[{DateTime.Now.ToString("HH:mm:ss")}] {text}\n");
+            rtbTerminal.AppendText($"{prefix}[{DateTime.Now:HH:mm:ss}] {text}\n");
             // Scroll to end of text
             rtbTerminal.SelectionStart = rtbTerminal.Text.Length;
             rtbTerminal.ScrollToCaret();
@@ -82,7 +84,7 @@ public partial class Form : System.Windows.Forms.Form
 
     private void IndicateActionsRunState()
     {
-        this.Invoke(new Action(() =>
+        Invoke(new Action(() =>
         {
             btnRun.Text = "Stop";
             runningActions = true;
@@ -91,7 +93,7 @@ public partial class Form : System.Windows.Forms.Form
 
     private void IndicateActionsStopState()
     {
-        this.Invoke(new Action(() =>
+        Invoke(new Action(() =>
         {
             btnRun.Text = "Run";
             runningActions = false;
@@ -159,13 +161,9 @@ public partial class Form : System.Windows.Forms.Form
                     return false;
 
                 if (iteration == 1 && totalIterations == 1)
-                {
                     LogToUserConsole($"Running action [{i - skippedRows + 1}/{rowCount}]: {actionName}");
-                }
                 else
-                {
                     LogToUserConsole($"Running action [{iteration}/{totalIterations}, {i - skippedRows + 1}/{rowCount}]: {actionName}");
-                }
 
                 PerformAction(actionName);
             }
@@ -177,17 +175,11 @@ public partial class Form : System.Windows.Forms.Form
     private void PerformAction(string actionName)
     {
         if (Actions.IsDelayAction(actionName))
-        {
             PerformDelayAction(actionName);
-        }
         else if (Actions.IsMouseAction(actionName))
-        {
             PerformMouseAction(actionName);
-        }
         else
-        {
             PerformKeyboardAction(actionName);
-        }
     }
 
     private void PerformDelayAction(string actionName)
@@ -256,6 +248,9 @@ public partial class Form : System.Windows.Forms.Form
         Actions.Action action = Actions.GetAction(actionName);
         if (action.Code != null)
             SendKeys.SendWait(action.Code);
+        else
+            // Action is a literal string to type
+            SendKeys.SendWait(actionName);
     }
 
     private static string ParseActionName(DataGridViewRow row)
@@ -278,27 +273,20 @@ public partial class Form : System.Windows.Forms.Form
             return;
 
         if (text == "1" && lblSeconds.Text != "second")
-        {
             lblSeconds.Text = $"second";
-        }
         else
-        {
             lblSeconds.Text = $"seconds";
-        }
     }
 
     private void dgvActions_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
     {
-
+        e.CellStyle.ForeColor = dgvActions.DefaultCellStyle.ForeColor;
         e.CellStyle.BackColor = dgvActions.DefaultCellStyle.BackColor;
 
         // Check if currently on the Product column
 
-        DataGridView dgv = sender as DataGridView;
-        if (dgv == null || dgv.CurrentCell == null || !(e.Control is ComboBox))
-        {
+        if (sender is not DataGridView dgv || dgv.CurrentCell == null || !(e.Control is ComboBox))
             return;
-        }
 
         ComboBox cbo = (ComboBox)e.Control;
         cbo.DropDownStyle = ComboBoxStyle.DropDown;
@@ -312,8 +300,6 @@ public partial class Form : System.Windows.Forms.Form
         // 29.0.0.0 - There was an issue when typing in the value and clicking tab sometimes wouldn't register a ValueChange
         // So here we intercept any current text just entered into the dropdown and force it to change value
         if (dgvActions.CurrentCell != null)
-        {
             dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace auto_desktop
+﻿namespace auto_desktop.Classes
 {
     internal class Actions
     {

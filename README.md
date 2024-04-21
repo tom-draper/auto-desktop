@@ -2,4 +2,14 @@
 
 An easy-to-use Windows desktop application for automatic keyboard and mouse entry.
 
-![Example2](https://github.com/tom-draper/auto-desktop/assets/41476809/99446aeb-8295-4f74-8c60-f32eeac946e9)
+![Example](https://github.com/tom-draper/auto-desktop/assets/41476809/99446aeb-8295-4f74-8c60-f32eeac946e9)
+
+## Contributions
+
+Contributions, issues and feature requests are welcome.
+
+- Fork it (https://github.com/tom-draper/api-analytics)
+- Create your feature branch (`git checkout -b my-new-feature`)
+- Commit your changes (`git commit -am 'Add some feature'`)
+- Push to the branch (`git push origin my-new-feature`)
+- Create a new Pull Request

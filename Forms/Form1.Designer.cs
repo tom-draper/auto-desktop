@@ -141,11 +141,11 @@ partial class Form
         rtbTerminal.BorderStyle = BorderStyle.None;
         rtbTerminal.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
         rtbTerminal.ForeColor = Color.White;
-        rtbTerminal.Location = new Point(414, 0);
+        rtbTerminal.Location = new Point(414, -22);
         rtbTerminal.Margin = new Padding(1);
         rtbTerminal.Name = "rtbTerminal";
         rtbTerminal.ReadOnly = true;
-        rtbTerminal.Size = new Size(385, 437);
+        rtbTerminal.Size = new Size(385, 459);
         rtbTerminal.TabIndex = 4;
         rtbTerminal.Text = "\n";
         // 

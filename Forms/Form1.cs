@@ -75,7 +75,7 @@ public partial class Form : System.Windows.Forms.Form
         string prefix = prefixNewline ? "\n" : "";
         Invoke(new Action(() =>
         {
-            rtbTerminal.AppendText($"{prefix}[{DateTime.Now:HH:mm:ss}] {text}\n");
+            rtbTerminal.AppendText($"{prefix}[{DateTime.Now:HH:mm:ss.fff}] {text}\n");
             // Scroll to end of text
             rtbTerminal.SelectionStart = rtbTerminal.Text.Length;
             rtbTerminal.ScrollToCaret();
@@ -172,7 +172,7 @@ public partial class Form : System.Windows.Forms.Form
         return true;
     }
 
-    private void PerformAction(string actionName)
+    private static void PerformAction(string actionName)
     {
         if (Actions.IsDelayAction(actionName))
             PerformDelayAction(actionName);
@@ -182,7 +182,7 @@ public partial class Form : System.Windows.Forms.Form
             PerformKeyboardAction(actionName);
     }
 
-    private void PerformDelayAction(string actionName)
+    private static void PerformDelayAction(string actionName)
     {
         switch (actionName)
         {
@@ -213,7 +213,6 @@ public partial class Form : System.Windows.Forms.Form
 
     private static void PerformMouseAction(string actionName)
     {
-
         switch (actionName)
         {
             case "Mouse 1px left":
@@ -245,8 +244,8 @@ public partial class Form : System.Windows.Forms.Form
 
     private static void PerformKeyboardAction(string actionName)
     {
-        Actions.Action action = Actions.GetAction(actionName);
-        if (action.Code != null)
+        Actions.Action? action = Actions.GetAction(actionName);
+        if (action?.Code != null)
             SendKeys.SendWait(action.Code);
         else
             // Action is a literal string to type
@@ -283,23 +282,45 @@ public partial class Form : System.Windows.Forms.Form
         e.CellStyle.ForeColor = dgvActions.DefaultCellStyle.ForeColor;
         e.CellStyle.BackColor = dgvActions.DefaultCellStyle.BackColor;
 
-        // Check if currently on the Product column
-
-        if (sender is not DataGridView dgv || dgv.CurrentCell == null || !(e.Control is ComboBox))
+        if (sender is not DataGridView dgv || dgv.CurrentCell == null || e.Control is not ComboBox)
             return;
 
         ComboBox cbo = (ComboBox)e.Control;
         cbo.DropDownStyle = ComboBoxStyle.DropDown;
 
-        // 29.0.0.0 - We need this handler attached to this dropdown column only in order to force it to take the value entered in text if it fails to do so itself
         cbo.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
+        cbo.KeyUp += ComboBox_OnKeyUp;
+        cbo.Leave += ComboBox_OnLeave;
+    }
+
+    private void ComboBox_OnLeave(object? sender, EventArgs e)
+    {
+        dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
+        //if (dgvActions.CurrentCell.RowIndex == dgvActions.Rows.Count - 1)
+        //    dgvActions.Rows.Add();
     }
 
     private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        // 29.0.0.0 - There was an issue when typing in the value and clicking tab sometimes wouldn't register a ValueChange
-        // So here we intercept any current text just entered into the dropdown and force it to change value
-        if (dgvActions.CurrentCell != null)
-            dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
+        if (dgvActions.CurrentCell == null)
+            return;
+
+        dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
+
+        // Check if the current cell is in the last row
+        //if (dgvActions.CurrentCell.RowIndex == dgvActions.RowCount - 1)
+            // Add a new row to the DataGridView
+            //dgvActions.Rows.Add();
+    }
+
+    private void ComboBox_OnKeyUp(object sender, EventArgs e)
+    {
+        string value = dgvActions.CurrentCell.EditedFormattedValue.ToString() ?? "";
+        DataGridViewComboBoxColumn col = (DataGridViewComboBoxColumn)dgvActions.Columns[dgvActions.CurrentCell.ColumnIndex];
+        if (value != "" && !col.Items.Contains(value))
+        {
+            col.Items.Add(value);
+            //dgvActions.CurrentCell.Value = value;
+        }
     }
 }

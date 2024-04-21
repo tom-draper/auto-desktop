@@ -14,12 +14,12 @@
         {
             List<Action> actions = [];
             actions.AddRange(GetDelayActions());
-            actions.AddRange(GetLowerCaseLetterActions());
-            actions.AddRange(GetUpperCaseLetterActions());
-            actions.AddRange(GetNumberActions());
+            //actions.AddRange(GetLowerCaseLetterActions());
+            //actions.AddRange(GetUpperCaseLetterActions());
+            //actions.AddRange(GetNumberActions());
             actions.AddRange(GetUtilityActions());
             actions.AddRange(GetFunctionActions());
-            actions.AddRange(GetSymbolActions());
+            //actions.AddRange(GetSymbolActions());
             actions.AddRange(GetMouseActions());
 
             return actions;
@@ -166,7 +166,7 @@
             return _Actions;
         }
 
-        public static Action GetAction(string name)
+        public static Action? GetAction(string name)
         {
             return _Actions.FirstOrDefault(action => action.Name == name);
         }

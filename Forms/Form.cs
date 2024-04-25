@@ -161,9 +161,9 @@ public partial class Form : System.Windows.Forms.Form
                     return false;
 
                 if (iteration == 1 && totalIterations == 1)
-                    LogToUserConsole($"Running action [{i - skippedRows + 1}/{rowCount}]: {actionName}");
+                    LogToUserConsole($"Running action [{i - skippedRows + 1}/{rowCount} {j + 1}/{count}]: {actionName}");
                 else
-                    LogToUserConsole($"Running action [{iteration}/{totalIterations}, {i - skippedRows + 1}/{rowCount}]: {actionName}");
+                    LogToUserConsole($"Running action [{iteration}/{totalIterations}, {i - skippedRows + 1}/{rowCount} {j+1}/{count}]: {actionName}");
 
                 PerformAction(actionName);
             }
@@ -288,39 +288,26 @@ public partial class Form : System.Windows.Forms.Form
         ComboBox cbo = (ComboBox)e.Control;
         cbo.DropDownStyle = ComboBoxStyle.DropDown;
 
-        cbo.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
-        cbo.KeyUp += ComboBox_OnKeyUp;
         cbo.Leave += ComboBox_OnLeave;
+
+        // Unsubscribe from the events when the editing control is hidden
+        dgv.EditingControlShowing += (s, args) =>
+        {
+            if (args.Control is ComboBox comboBox)
+                comboBox.Leave -= ComboBox_OnLeave;
+        };
     }
 
     private void ComboBox_OnLeave(object? sender, EventArgs e)
     {
-        dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
-        //if (dgvActions.CurrentCell.RowIndex == dgvActions.Rows.Count - 1)
-        //    dgvActions.Rows.Add();
-    }
-
-    private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
-    {
         if (dgvActions.CurrentCell == null)
             return;
 
-        dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
-
-        // Check if the current cell is in the last row
-        //if (dgvActions.CurrentCell.RowIndex == dgvActions.RowCount - 1)
-            // Add a new row to the DataGridView
-            //dgvActions.Rows.Add();
-    }
-
-    private void ComboBox_OnKeyUp(object sender, EventArgs e)
-    {
         string value = dgvActions.CurrentCell.EditedFormattedValue.ToString() ?? "";
         DataGridViewComboBoxColumn col = (DataGridViewComboBoxColumn)dgvActions.Columns[dgvActions.CurrentCell.ColumnIndex];
         if (value != "" && !col.Items.Contains(value))
-        {
             col.Items.Add(value);
-            //dgvActions.CurrentCell.Value = value;
-        }
+
+        dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
     }
 }

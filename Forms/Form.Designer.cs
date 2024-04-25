@@ -217,6 +217,7 @@ partial class Form
         Controls.Add(rtbTerminal);
         Controls.Add(txtRepeat);
         Controls.Add(dgvActions);
+        Icon = (Icon)resources.GetObject("$this.Icon");
         Name = "Form";
         Text = "Auto Desktop";
         Load += Form_Load;

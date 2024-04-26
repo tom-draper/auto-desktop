@@ -136,7 +136,7 @@ partial class Form
         // 
         // rtbTerminal
         // 
-        rtbTerminal.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+        rtbTerminal.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         rtbTerminal.BackColor = Color.FromArgb(15, 21, 36);
         rtbTerminal.BorderStyle = BorderStyle.None;
         rtbTerminal.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -151,6 +151,7 @@ partial class Form
         // 
         // btnRun
         // 
+        btnRun.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
         btnRun.FlatStyle = FlatStyle.System;
         btnRun.Location = new Point(325, 397);
         btnRun.Name = "btnRun";
@@ -162,6 +163,7 @@ partial class Form
         // 
         // lblSeconds
         // 
+        lblSeconds.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
         lblSeconds.AutoSize = true;
         lblSeconds.ForeColor = Color.White;
         lblSeconds.Location = new Point(99, 401);
@@ -172,6 +174,7 @@ partial class Form
         // 
         // txtDelay
         // 
+        txtDelay.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
         txtDelay.BackColor = Color.FromArgb(15, 21, 36);
         txtDelay.BorderStyle = BorderStyle.None;
         txtDelay.ForeColor = Color.White;
@@ -185,6 +188,7 @@ partial class Form
         // 
         // label2
         // 
+        label2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
         label2.AutoSize = true;
         label2.ForeColor = Color.White;
         label2.Location = new Point(14, 401);

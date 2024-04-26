@@ -136,40 +136,54 @@ public partial class Form : System.Windows.Forms.Form
         return true;
     }
 
-    private bool RunActionsOnce(int iteration = 1, int totalIterations = 1)
+    private bool RunActionsOnce(int iteration = 0, int totalIterations = 1)
     {
-        int rowCount = CountActions();
-        int skippedRows = 0;
+        int totalActions = CountActions();
+        int actionsProcessed = 0;
         for (int i = 0; i < dgvActions.Rows.Count; i++)
         {
             DataGridViewRow row = dgvActions.Rows[i];
             string actionName = ParseActionName(row);
             if (actionName == "")
-            {
-                skippedRows++;
                 continue;
-            }
 
             row.Selected = true;
 
-            int count = ParseCount(row);
-
-            for (int j = 0; j < count; j++)
+            int actionRepeat = ParseCount(row);
+            for (int j = 0; j < actionRepeat; j++)
             {
                 // If stop button has been pressed since, cancel process
                 if (!runningActions)
                     return false;
 
-                if (iteration == 1 && totalIterations == 1)
-                    LogToUserConsole($"Running action [{i - skippedRows + 1}/{rowCount} {j + 1}/{count}]: {actionName}");
+                string counterText = GetCounterText(iteration, totalIterations, actionsProcessed, totalActions, j, actionRepeat);
+                if (counterText == "")
+                    LogToUserConsole($"Running action: {actionName}");
                 else
-                    LogToUserConsole($"Running action [{iteration}/{totalIterations}, {i - skippedRows + 1}/{rowCount} {j+1}/{count}]: {actionName}");
+                    LogToUserConsole($"Running action [{counterText}]: {actionName}");
 
                 PerformAction(actionName);
             }
+
             row.Selected = false;
+
+            actionsProcessed++;
         }
         return true;
+    }
+
+    private static string GetCounterText(int iteration, int totalIterations, int actionsProcessed, int totalActions, int actionRepeatCount, int actionRepeat)
+    {
+        if (totalIterations > 1)
+            return $"{iteration + 1}/{totalIterations} {actionsProcessed + 1}/{totalActions} {actionRepeatCount + 1}/{actionRepeat}";
+
+        if (totalActions > 1)
+            return $"{actionsProcessed + 1}/{totalActions} {actionRepeatCount + 1}/{actionRepeat}";
+
+        if (actionRepeat > 1)
+            return $"{actionRepeatCount + 1}/{actionRepeat}";
+
+        return "";
     }
 
     private static void PerformAction(string actionName)
@@ -239,6 +253,12 @@ public partial class Form : System.Windows.Forms.Form
                 mouse_event(MOUSEEVENTF_MIDDLEDOWN, 0, 0, 0, 0);
                 mouse_event(MOUSEEVENTF_MIDDLEUP, 0, 0, 0, 0);
                 break;
+            case "Scroll up":
+                mouse_event(0x0800, 0, 0, 120, 0);
+                break;
+            case "Scroll down":
+                mouse_event(0x0800, 0, 0, -120, 0);
+                break;
         }
     }
 
@@ -289,6 +309,7 @@ public partial class Form : System.Windows.Forms.Form
         cbo.DropDownStyle = ComboBoxStyle.DropDown;
 
         cbo.Leave += ComboBox_OnLeave;
+        cbo.SelectedValueChanged += ComboBox_CellValueChanged;
 
         // Unsubscribe from the events when the editing control is hidden
         dgv.EditingControlShowing += (s, args) =>
@@ -310,4 +331,18 @@ public partial class Form : System.Windows.Forms.Form
 
         dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
     }
+
+    private void ComboBox_CellValueChanged(object? sender, EventArgs e)
+    {
+        if (dgvActions.CurrentCell == null)
+            return;
+
+        string value = dgvActions.CurrentCell.EditedFormattedValue.ToString() ?? "";
+        DataGridViewComboBoxColumn col = (DataGridViewComboBoxColumn)dgvActions.Columns[dgvActions.CurrentCell.ColumnIndex];
+        if (value != "" && !col.Items.Contains(value))
+            col.Items.Add(value);
+
+        dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
+    }
+
 }

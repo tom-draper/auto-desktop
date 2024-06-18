@@ -151,9 +151,24 @@
             ];
         }
 
+        private static List<Action> GetMouseMovementActions()
+        {
+            return [
+                new Action("Mouse 1px left", null),
+                new Action("Mouse 1px right", null),
+                new Action("Mouse 1px up", null),
+                new Action("Mouse 1px down", null),
+            ];
+        }
+
         public static bool IsMouseAction(string actionName)
         {
             return GetMouseActions().Any(action => action.Name == actionName);
+        }
+
+        public static bool IsMouseMovementAction(string actionName)
+        {
+            return GetMouseMovementActions().Any(action => action.Name == actionName);
         }
 
         public static bool IsDelayAction(string actionName)

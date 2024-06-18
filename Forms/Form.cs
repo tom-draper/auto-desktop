@@ -150,19 +150,39 @@ public partial class Form : System.Windows.Forms.Form
             row.Selected = true;
 
             int actionRepeat = ParseCount(row);
-            for (int j = 0; j < actionRepeat; j++)
+            if (Actions.IsMouseMovementAction(actionName))
             {
                 // If stop button has been pressed since, cancel process
                 if (!runningActions)
                     return false;
+                    
+                int pixelsToMove = actionRepeat;
 
-                string counterText = GetCounterText(iteration, totalIterations, actionsProcessed, totalActions, j, actionRepeat);
+                string counterText = GetCounterText(iteration, totalIterations, actionsProcessed, totalActions, 0, 1);
+                string updatedActionName = actionName.Replace("1", pixelsToMove.ToString())
                 if (counterText == "")
-                    LogToUserConsole($"Running action: {actionName}");
+                    LogToUserConsole($"Running action: {updatedActionName}");
                 else
-                    LogToUserConsole($"Running action [{counterText}]: {actionName}");
+                    LogToUserConsole($"Running action [{counterText}]: {updatedActionName}");
 
-                PerformAction(actionName);
+                PerformMouseMovementAction(actionName, pixelsToMove);
+            } 
+            else
+            {
+                for (int j = 0; j < actionRepeat; j++)
+                {
+                    // If stop button has been pressed since, cancel process
+                    if (!runningActions)
+                        return false;
+
+                    string counterText = GetCounterText(iteration, totalIterations, actionsProcessed, totalActions, j, actionRepeat);
+                    if (counterText == "")
+                        LogToUserConsole($"Running action: {actionName}");
+                    else
+                        LogToUserConsole($"Running action [{counterText}]: {actionName}");
+
+                    PerformAction(actionName);
+                }
             }
 
             row.Selected = false;
@@ -258,6 +278,25 @@ public partial class Form : System.Windows.Forms.Form
                 break;
             case "Scroll down":
                 mouse_event(0x0800, 0, 0, -120, 0);
+                break;
+        }
+    }
+
+    private static void PerformMouseMovementAction(string actionName, int pixelsToMove)
+    {
+        switch (actionName)
+        {
+            case "Mouse 1px left":
+                Cursor.Position = new Point(Cursor.Position.X - pixelsToMove, Cursor.Position.Y);
+                break;
+            case "Mouse 1px right":
+                Cursor.Position = new Point(Cursor.Position.X + pixelsToMove, Cursor.Position.Y);
+                break;
+            case "Mouse 1px up":
+                Cursor.Position = new Point(Cursor.Position.X, Cursor.Position.Y - pixelsToMove);
+                break;
+            case "Mouse 1px down":
+                Cursor.Position = new Point(Cursor.Position.X, Cursor.Position.Y + pixelsToMove);
                 break;
         }
     }

@@ -184,7 +184,7 @@ namespace auto_desktop.Classes
 
         public static bool IsMultipliableAction(string actionName)
         {
-            return IsMouseMovementAction(actionName) || IsDelayAction(actionName);
+            return IsMouseMovementAction(actionName);
         }
 
     }

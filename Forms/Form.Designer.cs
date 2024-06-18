@@ -46,6 +46,9 @@ partial class Form
         txtDelay = new TextBox();
         label2 = new Label();
         pictureBox1 = new PictureBox();
+        btnInsertRow = new Button();
+        btnSave = new Button();
+        btnLoad = new Button();
         ((System.ComponentModel.ISupportInitialize)dgvActions).BeginInit();
         ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
         SuspendLayout();
@@ -57,6 +60,7 @@ partial class Form
         dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
         dataGridViewCellStyle1.SelectionForeColor = Color.White;
         dgvActions.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+        dgvActions.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
         dgvActions.BackgroundColor = Color.FromArgb(29, 35, 50);
         dgvActions.BorderStyle = BorderStyle.None;
         dgvActions.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
@@ -145,7 +149,7 @@ partial class Form
         rtbTerminal.Margin = new Padding(1);
         rtbTerminal.Name = "rtbTerminal";
         rtbTerminal.ReadOnly = true;
-        rtbTerminal.Size = new Size(385, 459);
+        rtbTerminal.Size = new Size(420, 459);
         rtbTerminal.TabIndex = 4;
         rtbTerminal.Text = "\n";
         // 
@@ -207,12 +211,54 @@ partial class Form
         pictureBox1.TabIndex = 9;
         pictureBox1.TabStop = false;
         // 
+        // btnInsertRow
+        // 
+        btnInsertRow.BackColor = Color.Transparent;
+        btnInsertRow.BackgroundImageLayout = ImageLayout.None;
+        btnInsertRow.FlatAppearance.BorderSize = 0;
+        btnInsertRow.FlatAppearance.MouseDownBackColor = Color.Transparent;
+        btnInsertRow.FlatAppearance.MouseOverBackColor = Color.Transparent;
+        btnInsertRow.FlatStyle = FlatStyle.Flat;
+        btnInsertRow.Font = new Font("Segoe UI", 9F);
+        btnInsertRow.Image = (Image)resources.GetObject("btnInsertRow.Image");
+        btnInsertRow.Location = new Point(270, 16);
+        btnInsertRow.Margin = new Padding(0);
+        btnInsertRow.Name = "btnInsertRow";
+        btnInsertRow.Size = new Size(24, 24);
+        btnInsertRow.TabIndex = 10;
+        btnInsertRow.UseVisualStyleBackColor = false;
+        btnInsertRow.Click += btnInsertRow_Click;
+        // 
+        // btnSave
+        // 
+        btnSave.Location = new Point(354, 18);
+        btnSave.Name = "btnSave";
+        btnSave.Size = new Size(46, 23);
+        btnSave.TabIndex = 11;
+        btnSave.Text = "Save";
+        btnSave.UseVisualStyleBackColor = true;
+        btnSave.Click += btnSave_Click;
+        // 
+        // btnLoad
+        // 
+        btnLoad.Location = new Point(302, 18);
+        btnLoad.Name = "btnLoad";
+        btnLoad.Size = new Size(46, 23);
+        btnLoad.TabIndex = 12;
+        btnLoad.Text = "Load";
+        btnLoad.UseVisualStyleBackColor = true;
+        btnLoad.Click += btnLoad_Click;
+        // 
         // Form
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
         BackColor = Color.FromArgb(29, 35, 50);
-        ClientSize = new Size(797, 432);
+        BackgroundImageLayout = ImageLayout.None;
+        ClientSize = new Size(832, 432);
+        Controls.Add(btnLoad);
+        Controls.Add(btnSave);
+        Controls.Add(btnInsertRow);
         Controls.Add(pictureBox1);
         Controls.Add(lblSeconds);
         Controls.Add(txtDelay);
@@ -243,4 +289,8 @@ partial class Form
     private DataGridViewComboBoxColumn Action;
     private DataGridViewTextBoxColumn Count;
     private PictureBox pictureBox1;
+    private Button btnInsertRow;
+    private Button button2;
+    private Button btnSave;
+    private Button btnLoad;
 }

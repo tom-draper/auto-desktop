@@ -215,6 +215,14 @@
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8IK//vo/MENaZvHh2egAAAAASUVORK5CYII=
 </value>
   </data>
+  <data name="btnInsertRow.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
+        DAAACwwBP0AiyAAAAGNJREFUSEtjGAXUBnJALAth0gbsAOJtECZtwAEophkYtYAgGPwWiALxHiCGGYSO
+        P0AxNjkQBukVBmKcgFILdgGxCBCTDWAG0QyMWkAQDH0LtgLxFgiTNkAKiCUhzFFAFcDAAABWBi5FKcJp
+        YgAAAABJRU5ErkJggg==
+</value>
+  </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAAE0GAABNBgAAAAAAAAAA

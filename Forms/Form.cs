@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using auto_desktop.Classes;
 
 namespace auto_desktop;
@@ -24,7 +26,7 @@ public partial class Form : System.Windows.Forms.Form
         {
             comboBoxColumn.Items.Clear();
             foreach (var action in Actions.GetActions())
-                comboBoxColumn.Items.Add(action.Name);
+                comboBoxColumn.Items.Add(action.Key);
         }
     }
 
@@ -129,7 +131,7 @@ public partial class Form : System.Windows.Forms.Form
         int count = ParseRepeat();
         for (int i = 0; i < count; i++)
         {
-            bool completed = RunActionsOnce(i + 1, count);
+            bool completed = RunActionsOnce(i, count);
             if (!completed)
                 return false;
         }
@@ -144,29 +146,29 @@ public partial class Form : System.Windows.Forms.Form
         {
             DataGridViewRow row = dgvActions.Rows[i];
             string actionName = ParseActionName(row);
-            if (actionName == "")
+            if (!Actions.IsAction(actionName))
                 continue;
 
             row.Selected = true;
 
             int actionRepeat = ParseCount(row);
-            if (Actions.IsMouseMovementAction(actionName))
+            if (Actions.IsMultipliableAction(actionName))
             {
                 // If stop button has been pressed since, cancel process
                 if (!runningActions)
                     return false;
-                    
-                int pixelsToMove = actionRepeat;
 
-                string counterText = GetCounterText(iteration, totalIterations, actionsProcessed, totalActions, 0, 1);
-                string updatedActionName = actionName.Replace("1", pixelsToMove.ToString())
+                int multiplier = actionRepeat;
+
+                string counterText = GetCounterText(iteration, totalIterations, actionsProcessed, totalActions, actionRepeat - 1, actionRepeat);
+                string updatedActionName = actionName.Replace("1", multiplier.ToString());
                 if (counterText == "")
                     LogToUserConsole($"Running action: {updatedActionName}");
                 else
                     LogToUserConsole($"Running action [{counterText}]: {updatedActionName}");
 
-                PerformMouseMovementAction(actionName, pixelsToMove);
-            } 
+                Actions.InvokeAction(actionName, actionRepeat);
+            }
             else
             {
                 for (int j = 0; j < actionRepeat; j++)
@@ -181,7 +183,7 @@ public partial class Form : System.Windows.Forms.Form
                     else
                         LogToUserConsole($"Running action [{counterText}]: {actionName}");
 
-                    PerformAction(actionName);
+                    Actions.InvokeAction(actionName);
                 }
             }
 
@@ -204,111 +206,6 @@ public partial class Form : System.Windows.Forms.Form
             return $"{actionRepeatCount + 1}/{actionRepeat}";
 
         return "";
-    }
-
-    private static void PerformAction(string actionName)
-    {
-        if (Actions.IsDelayAction(actionName))
-            PerformDelayAction(actionName);
-        else if (Actions.IsMouseAction(actionName))
-            PerformMouseAction(actionName);
-        else
-            PerformKeyboardAction(actionName);
-    }
-
-    private static void PerformDelayAction(string actionName)
-    {
-        switch (actionName)
-        {
-            case "Wait 1 millisecond":
-                Thread.Sleep(1);
-                break;
-            case "Wait 1 second":
-                Thread.Sleep(1000);
-                break;
-            case "Wait 1 minute":
-                Thread.Sleep(1000 * 60);
-                break;
-            case "Wait 1 hour":
-                Thread.Sleep(1000 * 60 * 60);
-                break;
-        }
-    }
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-    public static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
-
-    private const int MOUSEEVENTF_LEFTDOWN = 0x02;
-    private const int MOUSEEVENTF_LEFTUP = 0x04;
-    private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
-    private const int MOUSEEVENTF_RIGHTUP = 0x10;
-    private const int MOUSEEVENTF_MIDDLEDOWN = 0x20;
-    private const int MOUSEEVENTF_MIDDLEUP = 0x40;
-
-    private static void PerformMouseAction(string actionName)
-    {
-        switch (actionName)
-        {
-            case "Mouse 1px left":
-                Cursor.Position = new Point(Cursor.Position.X - 1, Cursor.Position.Y);
-                break;
-            case "Mouse 1px right":
-                Cursor.Position = new Point(Cursor.Position.X + 1, Cursor.Position.Y);
-                break;
-            case "Mouse 1px up":
-                Cursor.Position = new Point(Cursor.Position.X, Cursor.Position.Y - 1);
-                break;
-            case "Mouse 1px down":
-                Cursor.Position = new Point(Cursor.Position.X, Cursor.Position.Y + 1);
-                break;
-            case "Left click":
-                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-                break;
-            case "Right click":
-                mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
-                mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
-                break;
-            case "Middle click":
-                mouse_event(MOUSEEVENTF_MIDDLEDOWN, 0, 0, 0, 0);
-                mouse_event(MOUSEEVENTF_MIDDLEUP, 0, 0, 0, 0);
-                break;
-            case "Scroll up":
-                mouse_event(0x0800, 0, 0, 120, 0);
-                break;
-            case "Scroll down":
-                mouse_event(0x0800, 0, 0, -120, 0);
-                break;
-        }
-    }
-
-    private static void PerformMouseMovementAction(string actionName, int pixelsToMove)
-    {
-        switch (actionName)
-        {
-            case "Mouse 1px left":
-                Cursor.Position = new Point(Cursor.Position.X - pixelsToMove, Cursor.Position.Y);
-                break;
-            case "Mouse 1px right":
-                Cursor.Position = new Point(Cursor.Position.X + pixelsToMove, Cursor.Position.Y);
-                break;
-            case "Mouse 1px up":
-                Cursor.Position = new Point(Cursor.Position.X, Cursor.Position.Y - pixelsToMove);
-                break;
-            case "Mouse 1px down":
-                Cursor.Position = new Point(Cursor.Position.X, Cursor.Position.Y + pixelsToMove);
-                break;
-        }
-    }
-
-    private static void PerformKeyboardAction(string actionName)
-    {
-        Actions.Action? action = Actions.GetAction(actionName);
-        if (action?.Code != null)
-            SendKeys.SendWait(action.Code);
-        else
-            // Action is a literal string to type
-            SendKeys.SendWait(actionName);
     }
 
     private static string ParseActionName(DataGridViewRow row)
@@ -384,4 +281,68 @@ public partial class Form : System.Windows.Forms.Form
         dgvActions.CurrentCell.Value = dgvActions.CurrentCell.EditedFormattedValue;
     }
 
+    private void btnSave_Click(object sender, EventArgs e)
+    {
+        StringBuilder content = new();
+        foreach (DataGridViewRow row in dgvActions.Rows)
+        {
+            string actionName = ParseActionName(row);
+            if (actionName == "")
+                continue;
+
+            int actionRepeat = ParseCount(row);
+            content.AppendLine($"\"{actionName}\",{actionRepeat}");
+        }
+
+        FolderBrowserDialog fbd = new()
+        {
+            Description = "Custom Description"
+        };
+
+        if (fbd.ShowDialog() == DialogResult.OK)
+        {
+            string selectedPath = fbd.SelectedPath;
+            File.WriteAllText($"{selectedPath}/auto_desktop_{DateTime.Now:yyyMMddHHmmss}.csv", content.ToString());
+        }
+    }
+
+    private void btnInsertRow_Click(object sender, EventArgs e)
+    {
+        dgvActions.Rows.Insert(dgvActions.CurrentRow.Index);
+    }
+
+    private void btnLoad_Click(object sender, EventArgs e)
+    {
+        OpenFileDialog choofdlog = new()
+        {
+            Filter = "All Files (*.*)|*.*",
+            FilterIndex = 1,
+            Multiselect = true
+        };
+
+        if (choofdlog.ShowDialog() == DialogResult.OK)
+        {
+            string fileName = choofdlog.FileName;
+            using var reader = new StreamReader(fileName);
+            dgvActions.Rows.Clear();
+            while (!reader.EndOfStream)
+            {
+                string line = reader.ReadLine();
+                try
+                {
+                    string[] values = line.Split("\",");
+                    string action = values[0][1..]; // Remove leading quote
+                    string count = values[1];
+
+                    int index = dgvActions.Rows.Add();
+                    dgvActions.Rows[index].Cells[0].Value = action;
+                    dgvActions.Rows[index].Cells[1].Value = count;
+                }
+                catch (Exception)
+                {
+                    Debug.WriteLine($"Error reading line: {line}");
+                }
+            }
+        }
+    }
 }

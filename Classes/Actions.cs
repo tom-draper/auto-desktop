@@ -1,189 +1,191 @@
-﻿namespace auto_desktop.Classes
+﻿using System.Runtime.InteropServices;
+namespace auto_desktop.Classes
 {
     internal class Actions
     {
-        private static readonly List<Action> _Actions = InitialiseActions();
 
-        public class Action(string name, string? code)
+        private static Dictionary<string, Action<int>> InitialiseActions()
         {
-            public readonly string Name = name;
-            public readonly string? Code = code;
+            return MouseActions.Concat(UtilityActions).Concat(DelayActions).Concat(FunctionActions).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
-        private static List<Action> InitialiseActions()
+        private static Action<int> DelayLambda(int milliseconds)
         {
-            List<Action> actions = [];
-            actions.AddRange(GetDelayActions());
-            //actions.AddRange(GetLowerCaseLetterActions());
-            //actions.AddRange(GetUpperCaseLetterActions());
-            //actions.AddRange(GetNumberActions());
-            actions.AddRange(GetUtilityActions());
-            actions.AddRange(GetFunctionActions());
-            //actions.AddRange(GetSymbolActions());
-            actions.AddRange(GetMouseActions());
-
-            return actions;
+            return (multiplier) => { Thread.Sleep(milliseconds * multiplier); };
         }
 
-        private static List<Action> GetDelayActions()
+        private static Action<int> KeyEventLambda(string code)
         {
-            return [
-                new Action("Wait 1 millisecond", null),
-                new Action("Wait 1 second", null),
-                new Action("Wait 1 minute", null),
-                new Action("Wait 1 hour", null),
-            ];
+            return (_) => { SendKeys.SendWait(code); };
         }
 
-        private static List<Action> GetLowerCaseLetterActions()
+        private static Action<int> MouseMovementLambda(int x, int y)
         {
-            List<Action> lowerCaseActions = [];
-            for (int i = 97; i < 123; i++)
+            return (multiplier) => { Cursor.Position = new Point(Cursor.Position.X + (x * multiplier), Cursor.Position.Y + (y * multiplier)); };
+        }
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        public static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
+
+        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        private const int MOUSEEVENTF_LEFTUP = 0x04;
+        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+        private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        private const int MOUSEEVENTF_MIDDLEDOWN = 0x20;
+        private const int MOUSEEVENTF_MIDDLEUP = 0x40;
+
+
+        private static readonly Dictionary<string, Action<int>> DelayActions = NewDelayActions();
+
+        private static Dictionary<string, Action<int>> NewDelayActions()
+        {
+            return new Dictionary<string, Action<int>>
             {
-                char c = (char)i;
-                lowerCaseActions.Add(new Action(c.ToString(), c.ToString()));
-            }
-            return lowerCaseActions;
+                {"Wait 1 millisecond", DelayLambda(1)},
+                {"Wait 1 second", DelayLambda(1000)},
+                {"Wait 1 minute", DelayLambda(1000*60)},
+                {"Wait 1 hour", DelayLambda(1000 * 60 * 60)}
+            };
         }
 
-        private static List<Action> GetUpperCaseLetterActions()
-        {
-            List<Action> upperCaseActions = [];
-            for (int i = 65; i < 91; i++)
-            {
-                char c = (char)i;
-                upperCaseActions.Add(new Action(c.ToString(), c.ToString()));
-            }
-            return upperCaseActions;
-        }
+        private static readonly Dictionary<string, Action<int>> FunctionActions = NewFunctionActions();
 
-        private static List<Action> GetNumberActions()
+        private static Dictionary<string, Action<int>> NewFunctionActions()
         {
-            List<Action> numberActions = [];
-            for (int i = 48; i < 58; i++)
-            {
-                char c = (char)i;
-                numberActions.Add(new Action(c.ToString(), c.ToString()));
-            }
-            return numberActions;
-        }
-
-        private static List<Action> GetFunctionActions()
-        {
-            List<Action> functionActions = [];
+            Dictionary<string, Action<int>> functionActions = [];
             for (int i = 1; i < 13; i++)
-            {
-                functionActions.Add(new Action($"F{i}", $"{{F{i}}}"));
-            }
+                functionActions.Add($"F{i}", KeyEventLambda($"{{F{i}}}"));
             return functionActions;
         }
 
-        private static List<Action> GetUtilityActions()
+        private static readonly Dictionary<string, Action<int>> UtilityActions = NewUtilityActions();
+
+        private static Dictionary<string, Action<int>> NewUtilityActions()
         {
-            return [
-                new Action("Space", " "),
-                new Action("Enter", "{ENTER}"),
-                new Action("Up", "{UP}"),
-                new Action("Down", "{DOWN}"),
-                new Action("Left", "{LEFT}"),
-                new Action("Right", "{RIGHT}"),
-                new Action("Tab", "{TAB}"),
-                new Action("Backspace", "{BACKSPACE}"),
-                new Action("Delete", "{DELETE}"),
-                new Action("Home", "{HOME}"),
-                new Action("End", "{END}"),
-                new Action("Page Up", "{PGUP}"),
-                new Action("Page Down", "{PGDN}"),
-                new Action("Escape", "{ESC}"),
-            ];
+            return new Dictionary<string, Action<int>>
+            {
+                {"Space", KeyEventLambda(" ")},
+                {"Enter", KeyEventLambda("{ENTER}")},
+                {"Up", KeyEventLambda("{UP}")},
+                {"Down", KeyEventLambda("{DOWN}")},
+                {"Left", KeyEventLambda("{LEFT}")},
+                {"Right", KeyEventLambda("{RIGHT}")},
+                {"Tab", KeyEventLambda("{TAB}")},
+                {"Backspace", KeyEventLambda("{BACKSPACE}")},
+                {"Delete", KeyEventLambda("{DELETE}")},
+                {"Home", KeyEventLambda("{HOME}")},
+                {"End", KeyEventLambda("{END}")},
+                {"Page Up", KeyEventLambda("{PGUP}")},
+                {"Page Down", KeyEventLambda("{PGDN}")},
+                {"Escape", KeyEventLambda("{ESC}")},
+            };
         }
 
-        private static List<Action> GetSymbolActions()
+        private static readonly Dictionary<string, Action<int>> MouseActions = NewMouseActions();
+
+        private static Dictionary<string, Action<int>> NewMouseActions()
         {
-            return [
-                new Action("!", "!"),
-                new Action("@", "@"),
-                new Action("#", "#"),
-                new Action("$", "$"),
-                new Action("%", "%"),
-                new Action("^", "^"),
-                new Action("&", "&"),
-                new Action("*", "*"),
-                new Action("(", "("),
-                new Action(")", ")"),
-                new Action("-", "-"),
-                new Action("_", "_"),
-                new Action("=", "="),
-                new Action("+", "+"),
-                new Action("[", "["),
-                new Action("{", "{"),
-                new Action("]", "]"),
-                new Action("}", "}"),
-                new Action(";", ";"),
-                new Action(":", ":"),
-                new Action("'", "'"),
-                new Action("\"", "\""),
-                new Action(",", ","),
-                new Action("<", "<"),
-                new Action(".", "."),
-                new Action(">", ">"),
-                new Action("/", "/"),
-                new Action("?", "?"),
-                new Action("\\", "\\"),
-                new Action("|", "|"),
-                new Action("`", "`"),
-                new Action("~", "~"),
-            ];
+            return NewMouseClickActions().Concat(NewMouseMovementActions()).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
-        private static List<Action> GetMouseActions()
+        private static readonly Dictionary<string, Action<int>> MouseMovementActions = NewMouseMovementActions();
+
+        private static Dictionary<string, Action<int>> NewMouseMovementActions()
         {
-            return [
-                new Action("Left click", null),
-                new Action("Right click", null),
-                new Action("Middle click", null),
-                new Action("Scroll up", null),
-                new Action("Scroll down", null),
-                new Action("Mouse 1px left", null),
-                new Action("Mouse 1px right", null),
-                new Action("Mouse 1px up", null),
-                new Action("Mouse 1px down", null),
-            ];
+            return new Dictionary<string, Action<int>>
+            {
+                {"Mouse 1px left", MouseMovementLambda(-1, 0)},
+                {"Mouse 1px right", MouseMovementLambda(1, 0)},
+                {"Mouse 1px up", MouseMovementLambda(0, -1)},
+                {"Mouse 1px down", MouseMovementLambda(0, 1)},
+            };
         }
 
-        private static List<Action> GetMouseMovementActions()
+        private static readonly Dictionary<string, Action<int>> MouseClickActions = NewMouseClickActions();
+
+        private static Dictionary<string, Action<int>> NewMouseClickActions()
         {
-            return [
-                new Action("Mouse 1px left", null),
-                new Action("Mouse 1px right", null),
-                new Action("Mouse 1px up", null),
-                new Action("Mouse 1px down", null),
-            ];
+            return new Dictionary<string, Action<int>>
+            {
+                {"Left click", (_) => {
+                    mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                    mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                }},
+                {"Right click", (_) => {
+                    mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
+                    mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+                }},
+                {"Middle click", (_) => {
+                    mouse_event(MOUSEEVENTF_MIDDLEDOWN, 0, 0, 0, 0);
+                    mouse_event(MOUSEEVENTF_MIDDLEUP, 0, 0, 0, 0);
+                }},
+            };
+        }
+
+        private static readonly Dictionary<string, Action<int>> MouseScrollActions = NewMouseScrollActions();
+
+        private static Dictionary<string, Action<int>> NewMouseScrollActions()
+        {
+            return new Dictionary<string, Action<int>>
+            {
+                {"Scroll up", (_) => {
+                    mouse_event(0x0800, 0, 0, 120, 0);
+                }},
+                {"Scroll down", (_) => {
+                    mouse_event(0x0800, 0, 0, -120, 0);
+                }},
+            };
+        }
+
+        public static bool IsAction(string actionName)
+        {
+            return _Actions.ContainsKey(actionName);
         }
 
         public static bool IsMouseAction(string actionName)
         {
-            return GetMouseActions().Any(action => action.Name == actionName);
+            return MouseActions.ContainsKey(actionName);
         }
 
         public static bool IsMouseMovementAction(string actionName)
         {
-            return GetMouseMovementActions().Any(action => action.Name == actionName);
+            return MouseMovementActions.ContainsKey(actionName);
         }
 
         public static bool IsDelayAction(string actionName)
         {
-            return GetDelayActions().Any(action => action.Name == actionName);
+            return DelayActions.ContainsKey(actionName);
         }
 
-        public static List<Action> GetActions()
+        private static readonly Dictionary<string, Action<int>> _Actions = InitialiseActions();
+
+        public static Dictionary<string, Action<int>> GetActions()
         {
             return _Actions;
         }
 
-        public static Action? GetAction(string name)
+        public static Action<int>? GetAction(string actionName)
         {
-            return _Actions.FirstOrDefault(action => action.Name == name);
+            _Actions.TryGetValue(actionName, out Action<int>? value);
+            return value;
         }
+
+        public static void InvokeAction(string actionName, int multiplier)
+        {
+            Action<int>? action = GetAction(actionName);
+            action?.Invoke(multiplier);
+        }
+
+        public static void InvokeAction(string actionName)
+        {
+            Action<int>? action = GetAction(actionName);
+            action?.Invoke(1);
+        }
+
+        public static bool IsMultipliableAction(string actionName)
+        {
+            return IsMouseMovementAction(actionName) || IsDelayAction(actionName);
+        }
+
     }
 }
